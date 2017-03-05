@@ -21,7 +21,7 @@ slack_inbound_url = 'https://hooks.slack.com/services/T3S93LZK6/B3Y34B94M/fExqXz
 def inbound():
     # Adding a delay so that all bots don't answer at once (could overload the API).
     # This will randomly choose a value between 0 and 10 using a uniform distribution.
-    delay = random.uniform(0, 10)
+    delay = random.uniform(0, 20)
     time.sleep(delay)
     response = {'username': 'abishek_bot', 'icon_emoji': ':robot_face:'}
     ip_address = request.remote_addr
