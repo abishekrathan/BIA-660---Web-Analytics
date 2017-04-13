@@ -330,42 +330,43 @@ def task_4_dbscan(flight_data):
         for i, item in enumerate(cluster):
             if i == (len(cluster) - 5):
                 break
-                mini = min(cluster[i:i + 5])
-                maxi = max(cluster[i:i + 5])
-                if (max - min <= 20):
-                    temp = cluster[i:i + 5]
-                else:
-                    continue
-                average_price = statistics.mean(temp)
-                if average_price < flag_average_price:
-                    flag_average_price = average_price
-                    flag_index = i
-                if flag_index is not None:
-                    best_price_list = cluster[flag_index:flag_index + 5]
-                    best_price_period_average = statistics.mean(best_price_list)
-                    if best_price_period_average < flag_best_price_period:
-                        flag_best_price_period = best_price_period_average
-                        best_cluster = cluster_index
+            mini = min(cluster[i:i + 5])
+            maxi = max(cluster[i:i + 5])
+            if (maxi - mini <= 20):
+                temp = cluster[i:i + 5]
+            else:
+                continue
+            average_price = statistics.mean(temp)
+            if average_price < flag_average_price:
+                flag_average_price = average_price
+                flag_index = i
+            if flag_index is not None:
+                best_price_list = cluster[flag_index:flag_index + 5]
+                best_price_period_average = statistics.mean(best_price_list)
+                if best_price_period_average < flag_best_price_period:
+                    flag_best_price_period = best_price_period_average
+                    best_cluster = cluster_index
 
     df_best_period = pd.DataFrame(columns=('Start_Date', 'Price'))
     best_price_count = 0
     best_period_indices = index_list_of_clusters[best_cluster][flag_index:flag_index + 5]
     print "Best Price Indices:{}".format(best_period_indices)
     print "Best Price Period"
+    #output_list = []
     for value in best_period_indices:
+
         df_best_period.loc[best_price_count] = flight_data.ix[value]
         best_price_count += 1
-    df_best_period
+    return df_best_period
 
-#Testing
-#Task 1
+
 #print scrape_data('2017-04-18', 'New York', 'Scandinavia', 'alesund')
-#Task 2
+
 flight_data = scrape_data_90('2017-04-18', 'New York', 'Spain', 'malaga')
 #print flight_data
-#Task 3
-print task_3_dbscan(flight_data)
-#Task 4
-print task_3_IQR(flight_data)
+
+#print task_3_dbscan(flight_data)
+
+#print task_3_IQR(flight_data)
 
 print task_4_dbscan(flight_data)
