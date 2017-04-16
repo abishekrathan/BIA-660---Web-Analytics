@@ -15,6 +15,7 @@ import numpy as np
 from scipy.spatial.distance import cdist, euclidean
 import statistics
 import matplotlib.pyplot as plt
+from heapq import nsmallest
 
 
 # Task 1
@@ -275,7 +276,7 @@ def clean_data_days(flight_data):
 
 def task_4_dbscan(flight_data):
     df_days = clean_data_days(flight_data)
-    from heapq import nsmallest
+    
     X = StandardScaler().fit_transform(df_days[['Start_Date', 'Price']])
     db = DBSCAN(eps=.4, min_samples=5).fit(X)
 
