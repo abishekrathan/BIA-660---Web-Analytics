@@ -275,6 +275,7 @@ def clean_data_days(flight_data):
 
 def task_4_dbscan(flight_data):
     df_days = clean_data_days(flight_data)
+    from heapq import nsmallest
     X = StandardScaler().fit_transform(df_days[['Start_Date', 'Price']])
     db = DBSCAN(eps=.4, min_samples=5).fit(X)
 
@@ -310,51 +311,50 @@ def task_4_dbscan(flight_data):
     # cluster wise price
     cluster_price_list = []
     cluster_price = []
-
-    for key,value in enumerate(index_list_of_clusters):
+    for value in index_list_of_clusters:
         for index in value:
             cluster_price.append(price[index])
-        cluster_price_list.insert(key,cluster_price)
+        cluster_price_list.append(cluster_price)
         cluster_price = []
 
     print cluster_price_list
 
     # finding best price period
-    best_price_list = []
+
     flag_index = 0
     flag_average_price = 100000
-    flag_best_price_period = 100000
-    best_cluster = 0
 
-    for cluster_index, cluster in enumerate(cluster_price_list):
-        for i, item in enumerate(cluster):
-            if i == (len(cluster) - 5):
-                break
-            mini = min(cluster[i:i + 5])
-            maxi = max(cluster[i:i + 5])
-            if (maxi - mini <= 20):
-                temp = cluster[i:i + 5]
-            else:
-                continue
-            average_price = statistics.mean(temp)
-            if average_price < flag_average_price:
-                flag_average_price = average_price
+    best_cluster = nsmallest(1, cluster_price_list)
+    best_cluster_index = cluster_price_list.index(min(cluster_price_list))
+    print best_cluster_index
+    for i in range(0, len(best_cluster)):
+        if i == len(best_cluster) - 5:
+            break
+        if len(best_cluster) > 5:
+            maxi = max(best_cluster[i:i + 5])
+            mini = min(best_cluster[i:i + 5])
+            # print maxi,mini
+            if maxi - mini < 20:
+                temp_average = statistics.mean(best_cluster[i:i + 5])
+                if temp_average < flag_average_price:
+                    temp_best_period = best_cluster[i:i + 5]
+                    flag_index = i
+        elif len(best_cluster) == 5:
+            # if len(item) == 5:
+            maxi = max(best_cluster[i:i + 5])
+            mini = min(best_cluster[i:i + 5])
+            if maxi - mini < 20:
+                temp_best_period = best_cluster[i:i + 5]
                 flag_index = i
-            if flag_index is not None:
-                best_price_list = cluster[flag_index:flag_index + 5]
-                best_price_period_average = statistics.mean(best_price_list)
-                if best_price_period_average < flag_best_price_period:
-                    flag_best_price_period = best_price_period_average
-                    best_cluster = cluster_index
+    # print temp_best_period
+
 
     df_best_period = pd.DataFrame(columns=('Start_Date', 'Price'))
     best_price_count = 0
-    best_period_indices = index_list_of_clusters[best_cluster][flag_index:flag_index + 5]
+    best_period_indices = index_list_of_clusters[best_cluster_index][flag_index:flag_index + 5]
     print "Best Price Indices:{}".format(best_period_indices)
     print "Best Price Period"
-    #output_list = []
     for value in best_period_indices:
-
         df_best_period.loc[best_price_count] = flight_data.ix[value]
         best_price_count += 1
     return df_best_period
